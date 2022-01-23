@@ -1,4 +1,5 @@
 'use strict';
+
 // constants
 
 const showModalBtns = document.querySelectorAll('.btn--show-modal');
@@ -9,6 +10,9 @@ const overlay = document.querySelector('.overlay');
 const navLinkContainer = document.querySelector('.nav__links');
 const navLinks = document.querySelectorAll('.nav__link');
 const logo = document.querySelector('.nav__logo');
+
+const btnLearnMore = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
 
 //functions
 
@@ -33,10 +37,27 @@ const navLinkFade = function (e) {
   }
 };
 
-//Events
+const smoothScroll = function (e) {
+  e.preventDefault();
+  if (!e.target.classList.contains('btn--show-modal')) {
+    const href = e.target.getAttribute('href');
+    const section = document.querySelector(href);
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
+const oldSchoolSmoothScroll = function () {
+  const s1coords = section1.getBoundingClientRect();
+  window.scrollTo({
+    left: s1coords.left + window.pageXOffset,
+    top: s1coords.top + window.pageYOffset,
+    behavior: 'smooth',
+  });
+};
+
+//Events and Observers
 
 //modal controls
-
 showModalBtns.forEach(function (btn) {
   btn.addEventListener('click', openModal);
 });
@@ -57,3 +78,9 @@ overlay.addEventListener('click', function (e) {
 // nav links fading
 navLinkContainer.addEventListener('mouseover', navLinkFade.bind(0.5));
 navLinkContainer.addEventListener('mouseout', navLinkFade.bind(1));
+
+//smooth scrolling
+navLinkContainer.addEventListener('click', smoothScroll);
+
+//old school scrolling
+btnLearnMore.addEventListener('click', oldSchoolSmoothScroll);
