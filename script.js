@@ -14,7 +14,18 @@ const logo = document.querySelector('.nav__logo');
 const btnLearnMore = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
 
+const navHeader = document.querySelector('.nav');
+const header = document.querySelector('header');
+
+const allSections = document.querySelectorAll('.section');
+
+const imgs = document.querySelectorAll('img[data-src]');
+
 //functions
+
+window.onbeforeunload = function () {
+  window.scrollTo(0, 0);
+};
 
 const openModal = function () {
   modal.classList.remove('hidden');
@@ -55,6 +66,34 @@ const oldSchoolSmoothScroll = function () {
   });
 };
 
+const stickyObsFunc = function (entries) {
+  const [entry] = entries;
+  if (!entry.isIntersecting) {
+    navHeader.classList.add('sticky');
+  } else {
+    navHeader.classList.remove('sticky');
+  }
+};
+
+const sectionObsFunc = function (entries) {
+  const [entry] = entries;
+  if (entry.isIntersecting) {
+    entry.target.classList.remove('section--hidden');
+    sectionObserver.unobserve(entry.target);
+  }
+};
+
+const lazyLoadObsFunc = function (entries) {
+  const [entry] = entries;
+  if (entry.isIntersecting) {
+    entry.target.src = entry.target.dataset.src;
+    entry.target.addEventListener('load', function () {
+      entry.target.classList.remove('lazy-img');
+    });
+    lazyLoadObserver.unobserve(entry.target);
+  }
+};
+
 //Events and Observers
 
 //modal controls
@@ -84,3 +123,44 @@ navLinkContainer.addEventListener('click', smoothScroll);
 
 //old school scrolling
 btnLearnMore.addEventListener('click', oldSchoolSmoothScroll);
+
+//sticky nav bar with observer API
+const stickyObsOptionsObj = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.5,
+};
+const stickyObserver = new IntersectionObserver(
+  stickyObsFunc,
+  stickyObsOptionsObj
+);
+stickyObserver.observe(header);
+
+//section reveal with observer API
+const sectionObsOptionsObj = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.1,
+};
+const sectionObserver = new IntersectionObserver(
+  sectionObsFunc,
+  sectionObsOptionsObj
+);
+allSections.forEach(function (section) {
+  sectionObserver.observe(section);
+  section.classList.add('section--hidden');
+});
+
+//lazy loading
+const lazyLoadObsOptionsObj = {
+  root: null,
+  rootMargin: '100px',
+  threshold: 0,
+};
+const lazyLoadObserver = new IntersectionObserver(
+  lazyLoadObsFunc,
+  lazyLoadObsOptionsObj
+);
+imgs.forEach(function (img) {
+  lazyLoadObserver.observe(img);
+});
