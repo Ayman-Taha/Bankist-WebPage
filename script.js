@@ -21,6 +21,10 @@ const allSections = document.querySelectorAll('.section');
 
 const imgs = document.querySelectorAll('img[data-src]');
 
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContents = document.querySelectorAll('.operations__content');
+
 //functions
 
 window.onbeforeunload = function () {
@@ -94,6 +98,22 @@ const lazyLoadObsFunc = function (entries) {
   }
 };
 
+const tabsFunction = function (e) {
+  const selectedTab = e.target.closest('.btn');
+  if (selectedTab) {
+    tabs.forEach(function (tab) {
+      tab.classList.remove('operations__tab--active');
+    });
+    tabsContents.forEach(function (tabContent) {
+      tabContent.classList.remove('operations__content--active');
+    });
+    selectedTab.classList.add('operations__tab--active');
+    document
+      .querySelector(`.operations__content--${selectedTab.dataset.tab}`)
+      .classList.add('operations__content--active');
+  }
+};
+
 //Events and Observers
 
 //modal controls
@@ -164,3 +184,6 @@ const lazyLoadObserver = new IntersectionObserver(
 imgs.forEach(function (img) {
   lazyLoadObserver.observe(img);
 });
+
+//tabbed component
+tabsContainer.addEventListener('click', tabsFunction);
