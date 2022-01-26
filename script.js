@@ -25,6 +25,11 @@ const tabsContainer = document.querySelector('.operations__tab-container');
 const tabs = document.querySelectorAll('.operations__tab');
 const tabsContents = document.querySelectorAll('.operations__content');
 
+const slides = document.querySelectorAll('.slide');
+const dotsContainer = document.querySelector('.dots');
+const leftBtn = document.querySelector('.slider__btn--left');
+const rightBtn = document.querySelector('.slider__btn--right');
+
 //functions
 
 window.onbeforeunload = function () {
@@ -114,6 +119,60 @@ const tabsFunction = function (e) {
   }
 };
 
+const init = function () {
+  for (let i = 0; i < slides.length; i++) {
+    dotsContainer.insertAdjacentHTML(
+      'beforeend',
+      `<span class="dots__dot" data-dot="${i}"></span>`
+    );
+  }
+  activateSlide(0);
+  activateDot(0);
+};
+
+const activateSlide = function (slide) {
+  slides.forEach(function (s, i) {
+    s.style.transform = `translateX(${100 * (i - slide)}%)`;
+  });
+};
+
+const activateDot = function (slide) {
+  document.querySelectorAll('.dots__dot').forEach(function (d) {
+    d.classList.remove('dots__dot--active');
+  });
+  document
+    .querySelector(`[data-dot="${slide}"]`)
+    .classList.add('dots__dot--active');
+};
+
+const nextSlide = function () {
+  if (currentSlide >= slides.length - 1) {
+    currentSlide = 0;
+  } else {
+    currentSlide++;
+  }
+  activateSlide(currentSlide);
+  activateDot(currentSlide);
+};
+
+const prevSlide = function () {
+  if (currentSlide <= 0) {
+    currentSlide = slides.length - 1;
+  } else {
+    currentSlide--;
+  }
+  activateSlide(currentSlide);
+  activateDot(currentSlide);
+};
+
+const dotClick = function (e) {
+  if (e.target.classList.contains('dots__dot')) {
+    const dotClicked = Number.parseInt(e.target.dataset.dot);
+    activateSlide(dotClicked);
+    activateDot(dotClicked);
+  }
+};
+
 //Events and Observers
 
 //modal controls
@@ -187,3 +246,96 @@ imgs.forEach(function (img) {
 
 //tabbed component
 tabsContainer.addEventListener('click', tabsFunction);
+
+//slider
+
+//init
+let currentSlide = 0;
+init();
+
+//arrows
+rightBtn.addEventListener('click', nextSlide);
+leftBtn.addEventListener('click', prevSlide);
+
+//keyboard
+document.addEventListener('keyup', function (e) {
+  if (e.key === 'ArrowLeft') {
+    prevSlide();
+  } else if (e.key === 'ArrowRight') {
+    nextSlide();
+  }
+});
+
+//dots
+dotsContainer.addEventListener('click', dotClick);
+
+// another way of doing the slider
+
+/*
+  const sliderInit = function () {
+    slides.forEach(function (slide, i) {
+      slide.style.transform = `translateX(${100 * i}%)`;
+    });
+  
+    for (let i = 0; i < slides.length; i++) {
+      dotsContainer.insertAdjacentHTML(
+        'beforeend',
+        `<span class="dots__dot" data-dot="${i}"></span>`
+      );
+    }
+  
+    dotsContainer.firstChild.classList.add('dots__dot--active');
+  };
+  const nextSlide = function () {
+    const curDot = document.querySelector(`.dots__dot--active`);
+    let curDotIndex = Number.parseInt(curDot.dataset.dot);
+    if (curDotIndex + 2 > slides.length) {
+      slides.forEach(function (slide, i) {
+        slide.style.transform = `translateX(${100 * i}%)`;
+      });
+    curDotIndex = 0;
+    dotsContainer.firstChild.classList.add('dots__dot--active');
+    curDot.classList.remove('dots__dot--active');
+  } else {
+    slides.forEach(function (slide, i) {
+      slide.style.transform = `translateX(${100 * (i - curDotIndex - 1)}%)`;
+    });
+    const nextDot = document.querySelector(`[data-dot="${curDotIndex + 1}"]`);
+    curDot.classList.remove('dots__dot--active');
+    nextDot.classList.add('dots__dot--active');
+  }
+};
+
+const prevSlide = function () {
+  const curDot = document.querySelector(`.dots__dot--active`);
+  let curDotIndex = Number.parseInt(curDot.dataset.dot);
+  if (curDotIndex < 1) {
+    curDotIndex = slides.length - 1;
+    slides.forEach(function (slide, i) {
+      slide.style.transform = `translateX(${100 * (i - curDotIndex)}%)`;
+    });
+    dotsContainer.lastChild.classList.add('dots__dot--active');
+    curDot.classList.remove('dots__dot--active');
+  } else {
+    slides.forEach(function (slide, i) {
+      slide.style.transform = `translateX(${100 * (i - curDotIndex + 1)}%)`;
+    });
+    const prevDot = document.querySelector(`[data-dot="${curDotIndex - 1}"]`);
+    curDot.classList.remove('dots__dot--active');
+    prevDot.classList.add('dots__dot--active');
+  }
+};
+
+const activateDot = function (e) {
+  if (e.target.classList.contains('dots__dot')) {
+    const curDot = Number.parseInt(e.target.dataset.dot);
+    document.querySelectorAll('.dots__dot').forEach(function (d) {
+      d.classList.remove('dots__dot--active');
+    });
+    e.target.classList.add('dots__dot--active');
+    slides.forEach(function (slide, i) {
+      slide.style.transform = `translateX(${100 * (i - curDot)}%)`;
+    });
+  }
+};
+*/
